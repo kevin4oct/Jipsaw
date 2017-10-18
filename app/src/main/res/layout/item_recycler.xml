@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="utf-8"?>
+<com.kevinyoung.jigsaw.view.Jigsaw xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/jigsaw_item"
+    android:layout_width="40dp"
+    android:layout_height="40dp"
+    android:orientation="vertical"/>
