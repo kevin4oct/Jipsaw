@@ -38,6 +38,7 @@ public class Scene extends RelativeLayout implements ScaleGestureDetector.OnScal
     public void addJigsaw(Jigsaw jigsaw) {
         jigsaw.setOnTouchListener(this);
         jigsawList.add(jigsaw);
+        addView(jigsaw);
 
     }
 
