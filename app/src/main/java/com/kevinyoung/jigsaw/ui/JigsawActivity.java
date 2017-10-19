@@ -9,6 +9,9 @@ import android.view.LayoutInflater;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.animation.AlphaAnimation;
+import android.view.animation.AnimationSet;
+import android.view.animation.LinearInterpolator;
 
 import com.kevinyoung.jigsaw.R;
 import com.kevinyoung.jigsaw.view.Jigsaw;
@@ -40,8 +43,6 @@ public class JigsawActivity extends AppCompatActivity {
         //
         mScene = (Scene) findViewById(R.id.scene);
         //
-
-        //
         container = new ArrayList<>();
         for (int i = 0; i < difficulty * difficulty; i++) {
             Jigsaw jigsaw = new Jigsaw(JigsawActivity.this);
@@ -50,7 +51,7 @@ public class JigsawActivity extends AppCompatActivity {
         }
     }
 
-    private class Adapter extends RecyclerView.Adapter<Adapter.ViewHolder> implements View.OnTouchListener{
+    private class Adapter extends RecyclerView.Adapter<Adapter.ViewHolder> implements View.OnClickListener {
 
         private LayoutInflater inflater;
 
@@ -64,7 +65,7 @@ public class JigsawActivity extends AppCompatActivity {
         @Override
         public ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
             View itemView = inflater.inflate(R.layout.item_recycler, parent, false);
-            itemView.setOnTouchListener(this);
+            itemView.setOnClickListener(this);
             return new ViewHolder(itemView);
         }
 
@@ -79,18 +80,38 @@ public class JigsawActivity extends AppCompatActivity {
         }
 
         @Override
-        public boolean onTouch(View v, MotionEvent event) {
-            switch (event.getAction() & MotionEvent.ACTION_MASK) {
-                case MotionEvent.ACTION_MOVE:
-                    mScene.addView(new Jigsaw(JigsawActivity.this));
-                    mScene.invalidate();
-                    long childItemId = mRecycler.getChildItemId(v);
-                    container.remove((int) childItemId);
-                    adapter.notifyDataSetChanged();
-                    Log.e(TAG, "onTouch:container长度： " + container.size());
-                    break;
-            }
-            return false;
+        public void onClick(View v) {
+            startAnimationSet(v);
+            long childItemId = mRecycler.getChildPosition(v);
+            container.remove((int) childItemId);
+            adapter.notifyDataSetChanged();
+        }
+
+        public void startAnimationSet(View v) {
+            //创建动画，参数表示他的子动画是否共用一个插值器
+            AnimationSet animationSet = new AnimationSet(true);
+            //添加动画
+            animationSet.addAnimation(new AlphaAnimation(1.0f, 0.0f));
+            //设置插值器
+            animationSet.setInterpolator(new LinearInterpolator());
+            //设置动画持续时长
+            animationSet.setDuration(500);
+            //设置动画结束之后是否保持动画的目标状态
+            animationSet.setFillAfter(true);
+            //设置动画结束之后是否保持动画开始时的状态
+            animationSet.setFillBefore(false);
+            //设置重复模式
+            animationSet.setRepeatMode(AnimationSet.REVERSE);
+            //设置重复次数
+            animationSet.setRepeatCount(AnimationSet.INFINITE);
+            //设置动画延时时间
+            animationSet.setStartOffset(0);
+            //取消动画
+            animationSet.cancel();
+            //释放资源
+            animationSet.reset();
+            //开始动画
+            v.startAnimation(animationSet);
         }
 
         class ViewHolder extends RecyclerView.ViewHolder implements View.OnTouchListener {
